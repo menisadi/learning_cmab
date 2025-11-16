@@ -29,7 +29,7 @@ from tqdm import tqdm
 # cd /Users/meni/Code/work/cmab
 
 # %%
-from simulator import Simulator
+from simulator import ContinousSimulator
 from epsilon_greedy import EpsilonGreedy
 from thomson_sampler import ThompsonSampling
 
@@ -47,7 +47,7 @@ epsilon = 0.01
 # ## Simulation
 
 # %%
-simulator = Simulator(n_arms, n_features)
+simulator = ContinousSimulator(n_arms, n_features)
 # estimator = EpsilonGreedy(epsilon, n_arms, n_features)
 estimator = ThompsonSampling(n_arms, n_features, lambda_prior=1.0)
 
@@ -112,7 +112,7 @@ plt.show()
 
 # %%
 # Reset simulator for fair comparison
-simulator = Simulator(n_arms, n_features)
+simulator = ContinousSimulator(n_arms, n_features)
 estimators = {
     "Epsilon-Greedy_explore": EpsilonGreedy(0.1, n_arms, n_features),
     "Epsilon-Greedy_sticky": EpsilonGreedy(0.01, n_arms, n_features),
