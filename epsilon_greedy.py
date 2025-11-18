@@ -8,19 +8,18 @@ class EpsilonGreedy:
         self.estimated_thetas = [np.zeros(n_features) for _ in range(n_arms)]
         self.arm_counts = np.zeros(n_arms)
 
-    def select_arm(self, x):
+    def select_arm(self, x: np.ndarray) -> int:
         if np.random.rand() < self.epsilon:
             return np.random.randint(len(self.estimated_thetas))
         estimated_rewards = [
             np.dot(self.estimated_thetas[a], x)
             for a in range(len(self.estimated_thetas))
         ]
-        return np.argmax(estimated_rewards)
+        return int(np.argmax(estimated_rewards))
 
-    def update(self, arm, x, reward):
-        # Simple online least squares update
+    def update(self, arm: int, x: np.ndarray, reward: float) -> None:
         self.arm_counts[arm] += 1
-        lr = 1 / self.arm_counts[arm]
+        n = self.arm_counts[arm]
         self.estimated_thetas[arm] += (
-            lr * (reward - np.dot(self.estimated_thetas[arm], x)) * x
+            (reward - np.dot(self.estimated_thetas[arm], x)) * x / n
         )

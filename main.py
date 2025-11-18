@@ -88,22 +88,14 @@ def run_binary_simulation():
     cumulative_reward = np.cumsum(rewards_history)
     regret = np.cumsum(np.array(optimal_rewards) - np.array(rewards_history))
 
+    print(f"Cumulative Reward after {n_rounds} rounds: {cumulative_reward[-1]:.2f}")
     print(
-        "\nCumulative Reward after {} rounds: {}".format(
-            n_rounds, cumulative_reward[-1]
-        )
+        f"Cumulative Optimal Reward after {n_rounds} rounds: {np.sum(optimal_rewards):.2f}"
     )
-    print(
-        "Cumulative Optimal Reward after {} rounds: {}".format(
-            n_rounds, np.sum(optimal_rewards)
-        )
-    )
-    print("Cumulative Regret after {} rounds: {}".format(n_rounds, regret[-1]))
+    print(f"Cumulative Regret after {n_rounds} rounds: {regret[-1]:.2f}")
 
     normalized_regret = regret / np.arange(1, n_rounds + 1)
-    print(
-        "Normalized Regret after {} rounds: {}".format(n_rounds, normalized_regret[-1])
-    )
+    print(f"Normalized Regret after {n_rounds} rounds: {normalized_regret[-1]:.4f}")
 
 
 def main():
