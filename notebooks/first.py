@@ -31,7 +31,7 @@ from tqdm import tqdm
 # %%
 from simulator import ContinousSimulator
 from epsilon_greedy import EpsilonGreedy
-from thomson_sampler import ThompsonSampling
+from thompson_sampler import ThompsonSampling
 
 # %% [markdown]
 # ## Parameters

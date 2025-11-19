@@ -33,6 +33,7 @@ from tqdm import tqdm
 # %%
 from simulator import BinarySimulator
 from epsilon_greedy_binary import BinaryEpsilonGreedy
+from binary_thompson_sampler import BinaryThompsonSampling
 
 # %% [markdown]
 # ## Parameters
@@ -61,15 +62,15 @@ for t in tqdm(range(n_rounds)):
 # Compute cumulative reward and regret
 cumulative_reward = np.cumsum(rewards_history)
 regret = np.cumsum(np.array(optimal_rewards) - np.array(rewards_history))
-print("\nCumulative Reward after {} rounds: {}".format(n_rounds, cumulative_reward[-1]))
+
+print(f"Cumulative Reward after {n_rounds} rounds: {cumulative_reward[-1]:.2f}")
 print(
-    "Cumulative Optimal Reward after {} rounds: {}".format(
-        n_rounds, np.sum(optimal_rewards)
-    )
+    f"Cumulative Optimal Reward after {n_rounds} rounds: {np.sum(optimal_rewards):.2f}"
 )
-print("Cumulative Regret after {} rounds: {}".format(n_rounds, regret[-1]))
+print(f"Cumulative Regret after {n_rounds} rounds: {regret[-1]:.2f}")
+
 normalized_regret = regret / np.arange(1, n_rounds + 1)
-print("Normalized Regret after {} rounds: {}".format(n_rounds, normalized_regret[-1]))
+print(f"Normalized Regret after {n_rounds} rounds: {normalized_regret[-1]:.4f}")
 
 # %% [markdown]
 # ## Results Visualization
@@ -101,4 +102,64 @@ plt.title("Normalized Regret Over Time")
 plt.legend()
 plt.tight_layout()
 
+
+# %% [markdown]
+# Comparing the performance of Binary Epsilon-Greedy with Thompson Sampling
+
+
+# Run both simulations
+def run_simulation(estimator, n_rounds, n_arms, p_success):
+    simulator = BinarySimulator(n_arms, p_success)
+    rewards_history = []
+    optimal_rewards = []
+    for t in range(n_rounds):
+        true_rewards = [simulator.p_success[a] for a in range(n_arms)]
+        optimal_rewards.append(np.max(true_rewards))
+
+        a_t = estimator.select_arm()
+        r_t = simulator.get_reward(a_t)
+        rewards_history.append(r_t)
+
+        estimator.update(a_t, r_t)
+
+    cumulative_reward = np.cumsum(rewards_history)
+    regret = np.cumsum(np.array(optimal_rewards) - np.array(rewards_history))
+    normalized_regret = regret / np.arange(1, n_rounds + 1)
+    return cumulative_reward, normalized_regret
+
+
 # %%
+n_rounds = 5000
+n_arms = 4
+p_sucess = np.random.rand(n_arms)
+
+# %%
+thompson_estimator = BinaryThompsonSampling(n_arms)
+epsilon_greedy_estimator = BinaryEpsilonGreedy(epsilon=0.05, n_arms=n_arms)
+
+thompson_cum_reward, thompson_norm_regret = run_simulation(
+    thompson_estimator, n_rounds, n_arms, p_sucess
+)
+epsilon_cum_reward, epsilon_norm_regret = run_simulation(
+    epsilon_greedy_estimator, n_rounds, n_arms, p_sucess
+)
+
+# %%
+plt.figure(figsize=(12, 5))
+plt.subplot(1, 2, 1)
+plt.plot(thompson_cum_reward, label="Thompson Sampling")
+plt.plot(epsilon_cum_reward, label="Epsilon-Greedy")
+plt.xlabel("Rounds")
+plt.ylabel("Cumulative Reward")
+plt.title("Cumulative Reward Comparison")
+plt.legend()
+plt.subplot(1, 2, 2)
+plt.plot(thompson_norm_regret, label="Thompson Sampling")
+plt.plot(epsilon_norm_regret, label="Epsilon-Greedy")
+plt.xlabel("Rounds")
+plt.ylabel("Normalized Regret")
+plt.title("Normalized Regret Comparison")
+plt.legend()
+plt.tight_layout()
+
+plt.show()

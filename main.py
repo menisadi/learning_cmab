@@ -3,7 +3,7 @@ from simulator import ContinousSimulator, BinarySimulator
 from binary_tompson_sampler import BinaryThompsonSampling
 from epsilon_greedy import EpsilonGreedy
 from epsilon_greedy_binary import BinaryEpsilonGreedy
-from thomson_sampler import ThompsonSampling
+from thompson_sampler import ThompsonSampling
 
 
 def run_continuos_simulation():
