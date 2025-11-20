@@ -25,6 +25,7 @@ class ThompsonSampling:
         n_arms: int,
         n_features: int,
         lambda_prior: float = 1.0,
+        discount_factor: float = 1.0,
         noise_std: float = 1.0,
     ):
         self.name = "Thompson Sampling"
@@ -32,6 +33,7 @@ class ThompsonSampling:
         self.n_features = n_features
         self.lambda_prior = lambda_prior
         self.noise_std = noise_std
+        self.discount_factor = discount_factor
 
         # For each arm, maintain A_a (precision-ish) and b_a.
         # Start with A_a = lambda * I, b_a = 0
@@ -80,6 +82,11 @@ class ThompsonSampling:
         x = np.asarray(x)
         # Precision weight from noise variance
         beta = 1.0 / (self.noise_std**2)
+
+        # Apply discount to all arms
+        for a in range(self.n_arms):
+            self.A[a] *= self.discount_factor
+            self.b[a] *= self.discount_factor
 
         # A_a <- A_a + beta x x^T
         self.A[arm] += beta * np.outer(x, x)

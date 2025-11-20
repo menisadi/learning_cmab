@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 from simulator import ContinousSimulator
 from epsilon_greedy import EpsilonGreedy
 from thompson_sampler import ThompsonSampling
+from tqdm import tqdm
 
 # %%
 n_rounds = 50_000
@@ -38,14 +39,14 @@ original_thetas = simulator.true_thetas.copy()
 shifted_thetas = np.random.randn(n_arms, n_features)  # New random thetas for the shift
 
 # estimator = EpsilonGreedy(epsilon, n_arms, n_features)
-estimator = ThompsonSampling(n_arms, n_features)
+estimator = ThompsonSampling(n_arms, n_features, discount_factor=1)
 
 rewards_history = []
 optimal_rewards = []
 theta_history = []
 
 # %%
-for t in range(n_rounds):
+for t in tqdm(range(n_rounds)):
     # Simulate parameter shift
     if t == shift_round:
         simulator.true_thetas = shifted_thetas.copy()
