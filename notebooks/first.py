@@ -32,12 +32,13 @@ from tqdm import tqdm
 from simulator import ContinousSimulator
 from epsilon_greedy import EpsilonGreedy
 from thompson_sampler import ThompsonSampling
+from lin_ucb import LinUCB
 
 # %% [markdown]
 # ## Parameters
 
 # %%
-n_rounds = 50_000
+n_rounds = 5_000
 n_arms = 4
 n_features = 5
 epsilon = 0.01
@@ -117,7 +118,9 @@ estimators = {
     "Epsilon-Greedy_explore": EpsilonGreedy(0.1, n_arms, n_features),
     "Epsilon-Greedy_sticky": EpsilonGreedy(0.01, n_arms, n_features),
     "Thompson Sampling": ThompsonSampling(n_arms, n_features, lambda_prior=1.0),
+    "LinUCB_alpha1": LinUCB(n_arms, n_features, alpha=1.0),
 }
+desc_width = max(len(name) for name in estimators)
 results = {}
 
 # %%
@@ -125,7 +128,7 @@ for name, estimator in estimators.items():
     rewards_history = []
     optimal_rewards = []
 
-    for t in tqdm(range(n_rounds), desc=f"Running {name}"):
+    for t in tqdm(range(n_rounds), desc=f"{name:<{desc_width}}"):
         x_t = np.random.randn(n_features)
         true_rewards = [np.dot(simulator.true_thetas[a], x_t) for a in range(n_arms)]
         optimal_rewards.append(np.max(true_rewards))

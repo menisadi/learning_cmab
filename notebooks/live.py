@@ -21,8 +21,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from simulator import ContinousSimulator
-from epsilon_greedy import EpsilonGreedy
+
+# from epsilon_greedy import EpsilonGreedy
 from thompson_sampler import ThompsonSampling
+from lin_ucb import LinUCB
 from tqdm import tqdm
 
 # %%
@@ -40,6 +42,7 @@ shifted_thetas = np.random.randn(n_arms, n_features)  # New random thetas for th
 
 # estimator = EpsilonGreedy(epsilon, n_arms, n_features)
 estimator = ThompsonSampling(n_arms, n_features, discount_factor=1)
+# estimator = LinUCB(n_arms, n_features, alpha=1.0)
 
 rewards_history = []
 optimal_rewards = []
