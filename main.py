@@ -1,6 +1,5 @@
 import numpy as np
-from simulator import ContinousSimulator, BinarySimulator
-from binary_tompson_sampler import BinaryThompsonSampling
+from simulator import BidFlooringSimulator, BinarySimulator, ContinousSimulator
 from epsilon_greedy import EpsilonGreedy
 from epsilon_greedy_binary import BinaryEpsilonGreedy
 from thompson_sampler import ThompsonSampling
@@ -98,9 +97,43 @@ def run_binary_simulation():
     print(f"Normalized Regret after {n_rounds} rounds: {normalized_regret[-1]:.4f}")
 
 
+def run_bid_flooring_simulation():
+    floor_options = [0.25, 0.5, 1.0, 1.5, 2.0]
+    batch_size = 200
+    n_batches = 50
+
+    simulator = BidFlooringSimulator(floor_options=floor_options, seed=42)
+    model = ThompsonSampling(
+        n_arms=len(floor_options),
+        n_features=simulator.n_features,
+        lambda_prior=1.0,
+        noise_std=0.5,
+    )
+
+    logs, batch_rewards = simulator.run_mini_batch(
+        model=model, n_batches=n_batches, batch_size=batch_size
+    )
+
+    total_impressions = len(logs)
+    average_reward = sum(log.reward for log in logs) / total_impressions
+    floor_counts = {floor: 0 for floor in floor_options}
+    for log in logs:
+        floor_counts[log.floor] += 1
+
+    print("Bid flooring simulation with mini-batch updates")
+    print(f"Total impressions: {total_impressions}")
+    print(f"Total revenue: {sum(batch_rewards):.2f}")
+    print(f"Average revenue per impression: {average_reward:.4f}")
+    print("Floors chosen:")
+    for floor, count in sorted(floor_counts.items()):
+        share = 100 * count / total_impressions
+        print(f"  Floor {floor:.2f}: {count} ({share:.1f}%)")
+
+
 def main():
     # run_continuos_simulation()
-    run_binary_simulation()
+    # run_binary_simulation()
+    run_bid_flooring_simulation()
 
 
 if __name__ == "__main__":
