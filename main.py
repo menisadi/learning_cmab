@@ -98,9 +98,10 @@ def run_binary_simulation():
 
 
 def run_bid_flooring_simulation():
-    floor_options = [0.25, 0.5, 1.0, 1.5, 2.0]
-    batch_size = 200
-    n_batches = 50
+    # floor_options = [0.25, 0.5, 1.0, 1.5, 2.0]
+    floor_options = np.linspace(0, 2.0, 8).tolist()
+    batch_size = 1000
+    n_batches = 500
 
     simulator = BidFlooringSimulator(floor_options=floor_options, seed=42)
     model = ThompsonSampling(

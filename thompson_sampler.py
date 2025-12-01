@@ -89,9 +89,9 @@ class ThompsonSampling:
             self.b[a] *= self.discount_factor
 
         # A_a <- A_a + beta x x^T
-        self.A[arm] += beta * np.outer(x, x)
+        self.A[arm] += beta * np.outer(x, x)  # shape: (n_features, n_features)
         # b_a <- b_a + beta r x
-        self.b[arm] += beta * reward * x
+        self.b[arm] += beta * reward * x  # shape: (n_features,)
 
         # Optionally, we could refresh estimated_thetas[arm] here too
         # (we already refresh in select_arm, but this keeps it always up to date)

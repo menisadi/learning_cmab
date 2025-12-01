@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 
+from tqdm import tqdm
 import numpy as np
 
 
@@ -137,7 +138,9 @@ class BidFlooringSimulator:
         )
         base = self._latent_value(context)
         mean_bid = max(0.05, self.base_bid * max(0.25, 1.0 + base))
-        return self.rng.lognormal(mean=np.log(mean_bid), sigma=self.bid_sigma, size=n_bidders)
+        return self.rng.lognormal(
+            mean=np.log(mean_bid), sigma=self.bid_sigma, size=n_bidders
+        )
 
     def calculate_reward(self, floor: float, bids: np.ndarray) -> float:
         """
@@ -149,7 +152,7 @@ class BidFlooringSimulator:
         return float(np.max(cleared))
 
     def run_mini_batch(
-        self, model, n_batches: int, batch_size: int
+        self, model, n_batches: int, batch_size: int, show_progress: bool = True
     ) -> Tuple[List[BidLog], np.ndarray]:
         """
         Run an online simulation with delayed (mini-batch) model updates.
@@ -161,11 +164,11 @@ class BidFlooringSimulator:
         logs: List[BidLog] = []
         batch_rewards = np.zeros(n_batches)
 
-        for batch_idx in range(n_batches):
+        for batch_idx in tqdm(range(n_batches), disable=not show_progress):
             batch_logs: List[BidLog] = []
 
             # Decision policy uses the snapshot of model parameters for this batch.
-            for _ in range(batch_size):
+            for _ in tqdm(range(batch_size), disable=not show_progress, leave=False):
                 context = self.sample_context()
                 features = self.encode_context(context)
                 arm = model.select_arm(features)
